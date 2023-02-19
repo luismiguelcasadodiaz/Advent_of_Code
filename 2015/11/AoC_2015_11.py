@@ -51,7 +51,8 @@ The next password after abcdefgh is abcdffaa.
 The next password after ghijklmn is ghjaabcc, because you eventually skip all 
 the passwords that start with ghi..., since i is not allowed.
 
-Given Santa's current password (your puzzle input), what should his next password be?
+Given Santa's current password (your puzzle input), what should his next
+ password be?
 """
 from string import ascii_lowercase
 import re
@@ -123,54 +124,66 @@ def r3(text:str)->bool:
   matcher2 = re.compile(r'(.)\1+')
   return len(tuple(matcher2.finditer(text))) >= 2
 
+def es_valido(text:str)->bool:
+  """
+  
+
+  Parameters
+  ----------
+  text : str
+    the password to check if it meets the three requirements
+
+  Returns
+  -------
+  bool
+    true in all 3 requirementes are ok
+    Flase otherwise.
+
+  """
+  return r1(text) and r2(text) and r3(text)
+
 def next_lowercase(char:str)->str:
-  pos=allowed_low.find(char)
-  if pos == numlowercase -1: # "z" found. Next = "a"
-    return "a"
-  else:
-    return allowed_low[pos + 1]
+  """
+  if chart is the last one of the allowed chart i return first one, else next one
 
-def next_potential_pass(text:str)->str:
-  end=len(text)-1
-  for i in range(end, -1 ,-1):
-    pos = allowed_low.find(text[i])
-    for j in range(pos,numlowercase):
-      next = next_lowercase(text[i])
+  Parameters
+  ----------
+  char : str
+    The char to increase
 
-      if next =="a": 
-        if i > 0:
-          pos_ant = allowed_low.find(text[i-1])
-          next_ant = next_lowercase(text[i-1])
-          if next_ant == "a":
-            text = text[:i] + next_ant + text[i+1:]
-          break
-      else:
-        text = text[:i] + next + text[i+1:]
-        print(text)
-    
-    
-"""def next_rec(text, i, final):
-  if i== 0:
-    next = next_lowercase(text)
-    if next == "a":
-      return text
-    else:
-      return next 
+  Returns
+  -------
+  str
+    DESCRIPTION.
+
+  """
+  if char == last_low:
+    return allowed_low[0]
   else:
-    next = next_lowercase(text[i])
-    if next == "a":
-      resultado = next_rec(text[:i], i-1,[]) + next
-      print(resultado)
-      #next_rec(resultado,i)
-    else:
-      resultado=text[:i] + next +text[i+1:]
-      print(resultado)
-      next_rec(resultado,i,[])
-"""
+    return allowed_low[allowed_low.find(char) + 1]
+
+  
+
 def inc_high_order(text:str)->str:
+  """
+  1.- initialize last password's char to first allowed char'
+  2.- from right to left i check if it is last allowed chart
+    if yes i change it to fisrt  alloed letter and moved to the left
+    if not i change it for the next ona and exit loop
+  Parameters
+  ----------
+  text : str
+    passwrd to increas
+
+  Returns
+  -------
+  str
+    increased password
+
+  """
   
   end=len(text)-1
-  text = text[:end] + allowed_low[0] #last car cha
+  text = text[:end] + allowed_low[0] #last car change for first allowed
   for i in range(end-1, -1 ,-1):
     if text[i] == last_low:
       text = text[:i] + allowed_low[0] + text[i+1:]
@@ -180,17 +193,28 @@ def inc_high_order(text:str)->str:
   return text
   
 
-def remove_from_lowercase(forbbiden:str)->str:
-  resultado=""
-  for low in ascii_lowercase:
-    if low not in forbbiden:
-      resultado+= low
-  return resultado
 
-def es_valido(text:str)->bool:
-  return r1(text) and r2(text) and r3(text)
+
+
 
 def next_pass(text:str)->str:
+  """
+  i enter and infintite loop till i found a right password
+  Here i change only last letter.
+  When i arrive to the last allowed char i incremente hta higher order char.
+  
+
+  Parameters
+  ----------
+  text : str
+    old password to update
+
+  Returns
+  -------
+  str
+    new password
+
+  """
   i=len(text)-1
   found=False
   while not found:
@@ -207,7 +231,7 @@ def next_pass(text:str)->str:
 
 
 forbbiden_low="iol"
-#allowed_low = remove_from_lowercase(forbbiden_low) with this test2 not passed
+#allowed_low = remove_from_lowercase(forbbiden_low) with this, test2 not passed
 allowed_low = ascii_lowercase
 numlowercase=len(allowed_low)
 last_low= allowed_low[-1]
