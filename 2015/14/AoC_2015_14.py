@@ -40,9 +40,9 @@ Given the descriptions of each reindeer (in your puzzle input),
 
 after exactly 2503 seconds, what distance has the winning reindeer traveled?
 """
-def get_data()->list:
+def get_data(filename)->list:
   my_data=[]
-  with open("input.txt","r") as f:
+  with open(filename,"r") as f:
     for line in f:
       my_line = line.strip().split(" ")
       my_data.append((my_line[0],my_line[3],my_line[6],my_line[13]))
@@ -50,5 +50,5 @@ def get_data()->list:
       
       
       
-data=get_data()
+data=get_data("test.txt")
 print(data)
