@@ -84,7 +84,9 @@ def get_rules()->list:
 
   """
   my_rules=[]
-  with open("input.txt",'r') as f:
+  #input.txt for part one
+  #input2.txt for part two
+  with open("input2.txt",'r') as f:
     for line in f:
       rule=line.strip().split()
       if rule[2] == 'gain':
@@ -166,10 +168,11 @@ def plot_graph(G,optimus,filename):
   edges=zip(a,b)
   M=nx.Graph()
   for edge in edges:
-    M.add_edges_from((edge[0],edge[1],{"h": G.edges[edge]["h"]}))
+    hapiness=G.edges[edge]["h"]
+    M.add_edges_from([(edge[0],edge[1],{"h": hapiness})])
     
   my_labels=nx.get_edge_attributes(M,'h')
-  nx.draw_networkx(M, pos=nx.circular_layout(M),font_size=20,node_size=900,
+  nx.draw_networkx(M, pos=nx.circular_layout(M),font_size=22,node_size=90,
                  node_shape="d",node_color="g",width=0.1,
                  connectionstyle='arc3, rad = 0.1')
   nx.draw_networkx_edge_labels(M, nx.circular_layout(M),font_size=12, 
@@ -186,4 +189,4 @@ G=create_graph(rules)
 optimus=find_best_path(G)
 
 print("the Happiness level in this table {} is {}".format(optimus[0][1], optimus[0][0]))
-plot_graph(G,optimus[0][1], "mesa.png")
+plot_graph(G,optimus[0][1], "mesa2.png")
