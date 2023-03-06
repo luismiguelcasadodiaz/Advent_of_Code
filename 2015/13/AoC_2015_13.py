@@ -54,8 +54,11 @@ of 330.
 What is the total change in happiness for the optimal seating arrangement of 
 the actual guest list?
 
-"""
+I APPROACH THIS PROBLEM WIHT THE HELP OF A GRAPH
 
+"""
+import networkx as nx
+import matplotlib.pyplot as plt
 def get_rules()->list:
   """
   Trasts the input file.
@@ -91,6 +94,96 @@ def get_rules()->list:
       my_rules.append([rule[0], rule[-1][:-1], value])
   return my_rules
 
+def create_graph(rules:list):
+  """
+  
+
+  Parameters
+  ----------
+  rules : list
+    A list wiht the rules to buid up the graph
+    the rules have this template ['Mallory', 'David', 91],
+    The value is tha hapiness changes Mallory when sitted next David
+
+  Returns
+  -------
+  my_graph : TYPE
+    A graph whose edges compute the totoa change of hapiness in both guests
+
+  """
+  my_graph = nx.Graph()
+  for rule in rules:
+      if (rule[1],rule[0]) in my_graph.edges():
+        my_graph[rule[0]][rule[1]]["h"] = rule[2] + my_graph[rule[1]][rule[0]]["h"]
+      else:
+        my_graph.add_edges_from([(rule[0],rule[1],{"h":rule[2]})])    
+  return my_graph
+
+def path_hapiness(G,path):
+  """
+  
+
+  Parameters
+  ----------
+  G : TYPE
+    graph wiht nodes ans edges
+  path : list of nodes
+    It is a path that includes all nodes.
+
+  Returns
+  -------
+  happiness : TYPE
+    sums up all h attirbute form the edges
+
+  """
+
+  b=path[1:]
+  b.append(path[0])
+  happiness= 0
+  edges= zip(path,b) #Create edges for the path that return to first position
+  for edge in edges:
+    happiness += G.edges[edge]["h"]
+  return happiness
+
+def find_best_path(G):
+  happiness_list = []
+  num_of_nodes=G.number_of_nodes()
+  for u in G.nodes:
+    for v in G.nodes:
+      for path in nx.all_simple_paths(G,u,v):
+        if len(path)== num_of_nodes:
+          happiness_list.append((path_hapiness(G,path),path))
+  return  sorted(happiness_list, key=lambda x: x[0], reverse=True)
+  
+        
+def plot_graph(G,optimus,filename):
+  pathfile="C:\\Users\\luism\\OneDrive\\Proyectos\\Python Scripts\\"
+  pathfile+="Advent_of_code\\2015\\13\\"+filename
+  
+  a=optimus
+  b=optimus[1:]
+  b.append(optimus[0])
+  edges=zip(a,b)
+  M=nx.Graph()
+  for edge in edges:
+    M.add_edges_from((edge[0],edge[1],{"h": G.edges[edge]["h"]}))
+    
+  my_labels=nx.get_edge_attributes(M,'h')
+  nx.draw_networkx(M, pos=nx.circular_layout(M),font_size=20,node_size=900,
+                 node_shape="d",node_color="g",width=0.1,
+                 connectionstyle='arc3, rad = 0.1')
+  nx.draw_networkx_edge_labels(M, nx.circular_layout(M),font_size=12, 
+                             label_pos=0.5,edge_labels=my_labels)
+  plt.rcParams["figure.figsize"] = [20,20]
+  #plt.rcParams["figure.dpi"] = [300]
+  plt.title("people at table")
+  plt.draw()
+  plt.savefig(pathfile)
+
 
 rules=get_rules()
-print(len(rules))
+G=create_graph(rules)
+optimus=find_best_path(G)
+
+print("the Happiness level in this table {} is {}".format(optimus[0][1], optimus[0][0]))
+plot_graph(G,optimus[0][1], "mesa.png")
