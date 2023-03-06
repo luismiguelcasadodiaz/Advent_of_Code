@@ -40,15 +40,98 @@ Given the descriptions of each reindeer (in your puzzle input),
 
 after exactly 2503 seconds, what distance has the winning reindeer traveled?
 """
-def get_data(filename)->list:
+from enum import Enum
+class idx(Enum):
+  NAME = 0
+  SPEED = 1
+  RUNTIME = 2
+  WAITTIME = 3
+  CYCLETIME = 4
+  CYCLES = 5
+  REMAINDER = 6
+  DISTANCE = 7
+
+def get_data(filename:str)->list:
+  """
+  
+
+  Parameters
+  ----------
+  filename : Str
+    file name wiht data.
+
+  Returns
+  -------
+  list
+    list of tuples wiht this template
+    ('Comet', '3', '37', '76')
+    (reindeer, Speed, runtime, waittime)
+
+  """
   my_data=[]
   with open(filename,"r") as f:
     for line in f:
-      my_line = line.strip().split(" ")
-      my_data.append((my_line[0],my_line[3],my_line[6],my_line[13]))
+      l = line.strip().split(" ")
+      my_data.append([l[0],int(l[3]),int(l[6]),int(l[13])])
   return my_data
       
+def pre_process(data)->list:
+  """
+  This funcion calculates traveled distance during simulation time:
+  
+    Each reinder cycles betwwen run and wait.
+    I calculate how many cicles fit into simultation time
+    DIstance = runtime * speed * num of clycles
+    
+    I take care at remainder time.
+    If in te remainder time fits a run time then a cycle is added
+    if not compute the distance ate the speed during remainder time.
+
+  Parameters
+  ----------
+  data : list of list
+  
+
+  Returns
+  -------
+  list of list: Ordered reversed by distance traveled.
+
+  """
+  for  r in data:
+    #Calculate cycle time
+    r.append(r[idx.RUNTIME.value] + r[idx.WAITTIME.value])
+    #How many cucles fit in simultaion time?
+    r.append( simulation_length // r[idx.CYCLETIME.value])
+    #calculate remainder time
+    r.append( simulation_length % r[idx.CYCLETIME.value])
+    #distance traveled in one cycle
+    distance = r[idx.SPEED.value] *  r[idx.RUNTIME.value]
+    
+    if r[idx.REMAINDER.value] >= r[idx.RUNTIME.value]:
+      #remainder is enoug for one more run time. Equals one moer cycle.
+      distance *= (r[idx.CYCLES.value]+1) 
+      r.append(distance)
+    else:
+      #remainder is not enough for one more cycle
+      distance *= r[idx.CYCLES.value] # times number of cycles
+      #plus remainder time at speed
+      distance += r[idx.SPEED.value] * r[idx.REMAINDER.value]
+      r.append(distance )
+  return sorted(data, key = lambda x:x[idx.DISTANCE.value], reverse=True)
+    
+    
+
       
-      
+simulation_length=1000
 data=get_data("test.txt")
-print(data)
+sorted_data = pre_process(data)
+print("Wiht test data {} wins and travels {}".format(
+  sorted_data[0][idx.NAME.value],  
+  sorted_data[0][idx.DISTANCE.value]))
+
+simulation_length=2503
+data=get_data("input.txt")
+sorted_data = pre_process(data)
+print("Wiht input data {} wins and travels {}".format(
+  sorted_data[0][idx.NAME.value],  
+  sorted_data[0][idx.DISTANCE.value]))
