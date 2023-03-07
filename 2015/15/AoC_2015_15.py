@@ -40,7 +40,7 @@ A flavor of 44*6 + 56*-2 = 152
 A texture of 44*3 + 56*-1 = 76
 
 Multiplying these together (68 * 80 * 152 * 76, ignoring calories for now) 
-results in a total score of 62842880, which happens to be the best score 
+results in a total score of 62 842 880, which happens to be the best score 
 possible given these ingredients. 
 
 If any properties had produced a negative total, it would have instead become 
@@ -48,6 +48,24 @@ zero, causing the whole score to multiply to zero.
 
 Given the ingredients in your kitchen and their properties, what is the total 
 score of the highest-scoring cookie you can make?
+
+--- Part Two ---
+Your cookie recipe becomes wildly popular! Someone asks if you can make another
+recipe that has exactly 500 calories per cookie (so they can use it as a meal 
+replacement). 
+
+Keep the rest of your award-winning process the same (100 teaspoons, same 
+ingredients, same scoring system).
+
+For example, given the ingredients above, if you had instead selected 
+40 teaspoons of butterscotch and 60 teaspoons of cinnamon (which still adds to 
+100), 
+The total calorie count would be 40*8 + 60*3 = 500. 
+The total score would go down, though: only 57 600 000, 
+the best you can do in such trying circumstances.
+
+Given the ingredients in your kitchen and their properties, what is the total 
+score of the highest-scoring cookie you can make with a calorie total of 500?
 
 """
 import os
@@ -87,6 +105,30 @@ def calculate_blend(teaspoons):
     multiplication *= properties[k]
   return multiplication
 
+def calculate_blend2(teaspoons):
+  """ As in part two i have to deal wiht Calories i adjust it
+  """
+  #create a dictionary for store operations.
+  properties={}
+  for k,v in ingredients[0][1].items():
+      properties.setdefault(k,0)
+      
+  my_keys = list(properties.keys())
+  for k in my_keys:
+    for i,v in enumerate(ingredients):
+      #here calculate a capacity of 44*-1 + 56*2 = 68
+      properties[k] += teaspoons[i] * v[1][k]
+      # check if negative
+    if properties[k] <= 0:
+      properties[k] = 0
+      
+  #Multiplying these together (68 * 80 * 152 * 76)
+  multiplication = 1
+  for k in my_keys[:-1]: #but Calories
+    multiplication *= properties[k]
+    
+  return multiplication, properties["calories"]
+
 
 if __name__ == "__main__":
   
@@ -94,16 +136,21 @@ if __name__ == "__main__":
   print(ingredients, numingredients, properties)
   
   teaspoons=[44,56]
-  score=calculate_blend(teaspoons)
-  print("TEST:highest-scoring is {} made of this blend {}".format(score, teaspoons))
+  score, calories =calculate_blend2(teaspoons)
+  txt="TEST:highest-scoring is {} made of this blend {}"
+  print(txt.format(score, teaspoons))
   print("="*80)
-  
+  teaspoons=[40,60]
+  score,calories= calculate_blend2(teaspoons)
+  txt="TEST 2:highest-scoring is {} made of this blend {} with {} Calories"
+  print(txt.format(score, teaspoons,calories))
+  print("="*80)  
   
   
   ingredients, numingredients, properties=get_data("input.txt")
   print(ingredients, numingredients, properties)
 
-  
+  resultados=[]
   MaxScore=0
   Maxteaspoons=[]
   for s in range(100,0,-1):
@@ -112,10 +159,16 @@ if __name__ == "__main__":
         for a in range(100 -s-p-f,0,-1):
           if s + p + f + a == 100:
             teaspoons=[s,p,f,a]
-            score=calculate_blend(teaspoons)
+            score, calories =calculate_blend2(teaspoons)
+            resultados.append((calories,score))
             if score > MaxScore:
-              Maxscore = score
+              MaxScore = score
               Maxteaspoons =teaspoons
-              
-  print("ONE:highest-scoring is {} made of this blend {}".format(Maxscore, Maxteaspoons))
+  txt="ONE:highest-scoring is {} made of this blend {}"            
+  print(txt.format(MaxScore, Maxteaspoons))
+  print("="*80)
+  calories500 = [x for x in resultados if x[0] == 500 and x[1] != 0]
+  calories500.sort(key=lambda x:x[1], reverse=True)
+  txt="TWO:with {} calories the highest-scoring is {}"            
+  print(txt.format(calories500[0][0], calories500[0][1]))
   print("="*80)
