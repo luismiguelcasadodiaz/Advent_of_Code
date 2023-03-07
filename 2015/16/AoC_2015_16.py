@@ -50,6 +50,20 @@ You make a list of the things you can remember about each Aunt Sue.
 Things missing from your list aren't zero - you simply don't remember the value.
 
 What is the number of the Sue that got you the gift?
+
+--- PART TWO ----
+
+As you're about to send the thank you note, something in the MFCSAM's 
+instructions catches your eye. 
+Apparently, it has an outdated retroencabulator, and so the output from the 
+machine isn't exact values - some of them indicate ranges.
+
+In particular, the cats and trees readings indicates that there are greater 
+than that many (due to the unpredictable nuclear decay of cat dander and tree 
+pollen), while the pomeranians and goldfish readings indicate that there are 
+fewer than that many (due to the modial interaction of magnetoreluctance).
+
+What is the number of the real Aunt Sue?
 """
 
 """
@@ -79,13 +93,28 @@ def get_data(filename):
       if (paper[line[2]] == line[3] and 
           paper[line[4]] == line[5] and 
           paper[line[6]] == line[7]):
-          print(line)
+          print("PART ONE",line)
+          
+      if (compare(line[2],line[3]) and
+          compare(line[4],line[5]) and
+          compare(line[6],line[7])):
+          print("PART TWO",line)
+            
         
 """      compounds.setdefault(myline[2],0)
       compounds.setdefault(myline[4],0)
       compounds.setdefault(myline[6],0)
   print(compounds)
 """
+def compare(compound, value):
+  if (compound == "cats" or compound == "trees"):
+    return paper[compound] < value
+  elif (compound == "pomeranians" or compound == "goldfish"):
+    return  value < paper[compound]
+  else:
+    return paper[compound] == value
+  
+
 if __name__ == "__main__":
   
   paper=dict({"children": 3,  "cats": 7,  "samoyeds": 2,  "pomeranians": 3,
