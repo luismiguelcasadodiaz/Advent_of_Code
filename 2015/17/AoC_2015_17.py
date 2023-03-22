@@ -24,3 +24,29 @@ Filling all containers entirely, how many different combinations of containers
 
 can exactly fit all 150 liters of eggnog?
 """
+
+"""
+This is a problem of sum of sets:
+  Several algoritms on internet explain how to answers yes/no to the question
+  if there are a set of containers that contain excactly 150 liters.
+  
+  
+  
+"""
+import os
+def getdata(filename)->list:
+  data=[]
+  path = os.path.join(os.getcwd(), filename)
+  with open(path,"r") as f:
+    for line in f:
+      data.append(int(line.strip()))
+  return data
+
+
+  
+if __name__ == "__main__":
+  settest=[20,15,10,5,5]
+  sumtest=25
+  
+  setone=getdata("input.txt")
+  sumone=150
